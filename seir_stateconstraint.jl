@@ -88,7 +88,7 @@ const solveeq = DifferentialEquations.solve
 tspan = (0.0f0, 50.0f0)
 ann = FastChain(FastDense(1, 32, relu), FastDense(32, 1), (x, p) -> 0.6 * sigmoid.(x) .+ 0.2)
 θ = initial_params(ann)
-function sir_nn(du, u, p, t)
+function sir_nn!(du, u, p, t)
     S, E, I, R, z = u
     du[1] = -(1 - ann([t], p)[1]) * β * S * I
     du[2] = (1 - ann([t], p)[1]) * β * S * I - ξ * E

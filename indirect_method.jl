@@ -9,8 +9,8 @@ function f(du, u, p, t)
 end
 
 function bc1!(residual, u, p, t)
-    residual[1] = u[1][1] - x0 # the solution at the middle of the time span should be -pi/2
-    residual[2] = u[end][2]# the solution at the end of the time span should be pi/2
+    residual[1] = u[1][1] - x0 
+    residual[2] = u[end][2]
 end
 tspan = (0,1)
 bvp1 = BVProblem(f, bc1!, [0, 0], tspan)
