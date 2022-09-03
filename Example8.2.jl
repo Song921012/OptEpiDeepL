@@ -10,7 +10,7 @@ x1 = 5
 
 
 # Model
-model = InfiniteModel(KNITRO.Optimizer)
+model = InfiniteModel(Ipopt.Optimizer)
 
 # infinite_parameter
 @infinite_parameter(model, t ∈ [t0, tf], num_supports = 101)

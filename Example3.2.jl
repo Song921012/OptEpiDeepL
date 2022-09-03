@@ -1,5 +1,4 @@
 using InfiniteOpt, Ipopt, Plots
-using KNITRO
 
 # Parmeters
 # Time span
@@ -10,7 +9,7 @@ x1 = 1
 
 
 # Model
-model = InfiniteModel(KNITRO.Optimizer)
+model = InfiniteModel(Ipopt.Optimizer)
 
 # infinite_parameter
 @infinite_parameter(model, t ∈ [t0, tf], num_supports = 101)
@@ -40,6 +39,7 @@ u_value = value(u)
 x_value = value(x)
 
 display(plot(ts, u_value))
+
 display(plot(ts, x_value))
 
 using DiffEqFlux, DifferentialEquations
@@ -76,13 +76,13 @@ callback(θ, l, pred) = begin
     end
     false
 end
-# cb = function (θ, l)
-#     println(l)
-#     p = plot(solveeq(remake(prob, p = θ), Tsit5(), saveat = ts), lw = 3)
-#     #plot!(p, ts, [first(ann([t], θ)) for t in ts], label = "u(t)", lw = 3)
-#     display(p)
-#     return false
-# end
+cb = function (θ, l)
+    println(l)
+    p = plot(solveeq(remake(prob, p = θ), Tsit5(), saveat = ts), lw = 3)
+    #plot!(p, ts, [first(ann([t], θ)) for t in ts], label = "u(t)", lw = 3)
+    display(p)
+    return false
+end
 # Display the ODE with the current parameter values.
 cb(θ, l)
 loss1 = loss_adjoint(θ)

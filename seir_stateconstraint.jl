@@ -1,3 +1,4 @@
+##
 using InfiniteOpt, Ipopt, Plots
 #using KNITRO
 
@@ -80,7 +81,7 @@ xlabel!("Time (Days)")
 ylabel!("Distancing Ratio")
 display(p1)
 
-
+##
 using DiffEqFlux, DifferentialEquations
 const solveeq = DifferentialEquations.solve
 
@@ -99,18 +100,13 @@ function sir_nn!(du, u, p, t)
 end
 u0 = [s0, e0, i0, r0, 0, 0]
 ts = Float32.(collect(0.0:1:tspan[2]))
-prob = ODEProblem(sir_nn, u0, tspan, θ)
+prob = ODEProblem(sir_nn!, u0, tspan, θ)
 sol_init = solveeq(prob, Vern9())
 plot(sol_init)
 function predict_adjoint(θ)
     Array(solveeq(prob, Vern9(), p=θ, saveat=ts, sensealg=InterpolatingAdjoint(autojacvec=ReverseDiffVJP(true))))
 end
 
-
-# function quadratic_relaxation(z, δ)
-#     return one(typeof(z)) / 2 * (((z - 2δ) / δ)^2 - one(typeof(z))) - log(δ)
-# end
-#
 λ = 10000
 for ii = 1:2
     λ = 10* λ
