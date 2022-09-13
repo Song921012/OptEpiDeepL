@@ -72,7 +72,7 @@ callback(θ, l, pred) = begin
         println(losses[end])
         p = plot(Array(solveeq(remake(prob, p=θ), Tsit5(), saveat=ts), lw=3)[1, :])
         #plot!(p, ts, [first(ann([t], θ)) for t in ts], label = "u(t)", lw = 3)
-        display(p)
+        #display(p)
     end
     false
 end
@@ -80,7 +80,7 @@ cb = function (θ, l)
     println(l)
     p = plot(solveeq(remake(prob, p=θ), Tsit5(), saveat=ts), lw=3)
     #plot!(p, ts, [first(ann([t], θ)) for t in ts], label = "u(t)", lw = 3)
-    display(p)
+    #display(p)
     return false
 end
 #Display the ODE with the current parameter values.
@@ -102,7 +102,7 @@ results_saving_opt.I = x_value
 results_saving_opt.u = u_value
 results_saving_opt.I_nn = Array(solveeq(remake(prob, p=p_value), Tsit5(), saveat=ts))[1, :]
 results_saving_opt.u_nn = [first(ann([t], p_value)) for t in ts]
-CSV.write("results_saving_Example3_2_mayer.csv", results_saving_opt)
+#CSV.write("results_saving_Example3_2_mayer.csv", results_saving_opt)
 
 plot(results_saving_opt.t, results_saving_opt.I, lw=2, label="State I(t) by direct collection")
 plot!(results_saving_opt.t, results_saving_opt.I_nn, lw=2, label="State I(t) by deep learning")
@@ -110,7 +110,7 @@ g(x) = exp(-x) / (1 + exp(-2)) + exp(x - 2) / (1 + exp(-2))
 plot!(results_saving_opt.t[2:end-1], g.(results_saving_opt.t[2:end-1]), foreground_color_legend=nothing, label=latexstring("Analytic solution \$ I(t) =\\exp(-x) / (1 + \\exp(-2)) + \\exp(x - 2) / (1 + \\exp(-2))\$"))
 xlabel!("t")
 ylabel!("I(t)")
-savefig("Example3_2_I_mayer.png")
+#savefig("Example3_2_I_mayer.png")
 
 plot(results_saving_opt.t[2:end-1], results_saving_opt.u[2:end-1], lw=2, label="Control u(t) by direct collection")
 plot!(results_saving_opt.t[2:end-1], results_saving_opt.u_nn[2:end-1], lw=2, label="Control u(t) by deep learning")
@@ -118,7 +118,7 @@ f(x) = 2 * exp(-x) / (1 + exp(-2))
 plot!(results_saving_opt.t[2:end-1], f.(results_saving_opt.t[2:end-1]), foreground_color_legend=nothing, label=latexstring("Analytic solution \$ u(t) =2*\\exp(-x)/(1+\\exp(-2))\$"))
 xlabel!("t")
 ylabel!("u(t)")
-savefig("Example3_2_control_mayer.png")
+#savefig("Example3_2_control_mayer.png")
 
 
 # 
