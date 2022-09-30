@@ -1,5 +1,5 @@
 using InfiniteOpt, Ipopt, Plots
-using KNITRO
+using Ipopt
 
 # Parmeters
 # Time span

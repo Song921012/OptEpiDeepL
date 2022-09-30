@@ -5,7 +5,7 @@ using InfiniteOpt, Ipopt, Plots
 # Parmeters
 # Time span
 t0 = 0
-tf = 1
+tf = 1 
 # Initial values
 x1 = 1
 
