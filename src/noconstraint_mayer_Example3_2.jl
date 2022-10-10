@@ -26,6 +26,7 @@ model = InfiniteModel(Ipopt.Optimizer)
 
 # constraint
 @constraint(model, x(0) == x1)
+
 @constraint(model, x_constr, ∂(x, t) == x - u)
 
 
