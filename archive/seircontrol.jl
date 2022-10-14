@@ -120,13 +120,13 @@ results_saving_opt.u_nn = [first(ann([t], re2.u)) for t in ts]
 CSV.write("results_saving_SEINmodel.csv", results_saving_opt)
 
 plot(results_saving_opt.t, results_saving_opt.I, lw = 2, label = "I(t) by direct collection")
-plot!(results_saving_opt.t, results_saving_opt.I_nn, lw = 2, label = "I(t) by deep learning")
+plot!(results_saving_opt.t, results_saving_opt.I_nn, lw = 2,foreground_color_legend=nothing, label = "I(t) by deep learning")
 xlabel!("t(day)")
 ylabel!("I(t)")
 savefig("sein_I.png")
 
 plot(results_saving_opt.t[2:end-1], results_saving_opt.u[2:end-1], lw = 2, label = "u(t) by direct collection")
-plot!(results_saving_opt.t[2:end-1], results_saving_opt.u_nn[2:end-1], lw = 2, label = "u(t) by deep learning")
+plot!(results_saving_opt.t[2:end-1], results_saving_opt.u_nn[2:end-1], lw = 2,foreground_color_legend=nothing, label = "u(t) by deep learning")
 xlabel!("t(day)")
 ylabel!("u(t)")
 savefig("sein_control.png")
