@@ -2,6 +2,8 @@
 using DifferentialEquations
 using DiffEqFlux, Flux
 using Plots
+using CSV
+using DataFrames
 using Random
 Random.seed!(14);
 source_data = DataFrame(CSV.File("./Source_Data/Provincial_Daily_Totals.csv"))
@@ -21,6 +23,7 @@ data_export = data_on[(n+1):n+m+1, [:SummaryDate, :TotalCases]]
 ontario_data_export = DataFrame()
 ontario_data_export.date = data_export.SummaryDate
 ontario_data_export.case = data_daily
+
 ontario_data_export.Accase = data_acc
 
 
@@ -43,26 +46,94 @@ end
 
 
 using BSON: @load
-@load "./DeepLearningEffectiveReproductionNumber/Saving_Data/ann_para_irbfgs100.bason" ann_param
-
+@load "./output/Saving_Data/ann_para_irbfgs100.bason" ann_param
+nday=59
 p_min = ann_param
-tspan_predict = (0.0, 149)
-scatter(data_acc, label = "Real accumulated cases")
-prob_prediction = ODEProblem(SIR_nn, u_0, tspan_data, p_min)
+npredict=nday
+tspan_predict = (0.0, npredict)
+data_acc_predict = data_on.TotalCases[(n+1):n+npredict+1]
+data_daily_predict = data_on.TotalCases[(n+1):n+npredict+1] - data_on.TotalCases[n:n+npredict]
+prob_prediction = ODEProblem(SIR_nn, u_0, tspan_predict, p_min)
 data_prediction = Array(solve(prob_prediction, Tsit5(), saveat = 1))
-plot!(data_prediction[2, :], label = "Fit accumulated cases")
+data_prediction_acc=data_prediction[2, :]
+data_prediction_daily=zeros(length(data_prediction_acc))
+data_prediction_daily[2:end]=data_prediction_acc[2:end]-data_prediction_acc[1:end-1]
+scatter(data_acc_predict, label = "Real accumulated cases")
+plot!(data_prediction[2, :], label = "Fit accumulated cases",foreground_color_legend=nothing,legend=:topleft)
 xlabel!("Days after Feb 25")
-
-tspan = collect(0:1:149)'
-ann_value = abs.(ann(tspan, p_min))'
-plot(ann_value, label = "Effective reproduction number")
+title!("Data fitting ($(nday+1) days training data)")
+savefig("output/epiforecastfitacc$nday.png")
+scatter(data_daily_predict, label = "Real daily cases")
+plot!(data_prediction_daily, label = "Fit daily cases",foreground_color_legend=nothing,legend=:topleft)
 xlabel!("Days after Feb 25")
+title!("Data fitting ($(nday+1) days training data)")
+savefig("output/epiforecastfitdaily$nday.png")
+##
+p_min = ann_param
+npredict=29+nday+1
+tspan_predict = (0.0, npredict)
+data_acc_predict = data_on.TotalCases[(n+1):n+npredict+1]
+data_daily_predict = data_on.TotalCases[(n+1):n+npredict+1] - data_on.TotalCases[n:n+npredict]
+scatter(data_acc_predict, label = "Real accumulated cases")
+prob_prediction = ODEProblem(SIR_nn, u_0, tspan_predict, p_min)
+data_prediction = Array(solve(prob_prediction, Tsit5(), saveat = 1))
+data_prediction_acc=data_prediction[2, :]
+data_prediction_daily=zeros(length(data_prediction_acc))
+data_prediction_daily[2:end]=data_prediction_acc[2:end]-data_prediction_acc[1:end-1]
+plot!(data_prediction[2, :], label = "Predicted accumulated cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("$(nday+1) days training data to predict 30 days cases")
+savefig("output/epiforecastpredictacc$nday.png")
+scatter(data_daily_predict, label = "Real daily cases")
+plot!(data_prediction_daily, label = "Predicted daily cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("$(nday+1) days training data to predict 30 days cases")
+savefig("output/epiforecastpredictdaily$nday.png")
 
-ontario_data_export.DLRt = abs.(ann(tspan, p_min))[1, :]
-ontario_data_export.DLAccases = data_prediction[2, :]
-A = zeros(150)
-A[1] =4
-A[2:150] = data_prediction[2, 1:end-1]
-ontario_data_export.DLdaily = data_prediction[2, :] -A
 
-CSV.write("ontario_DL_export.csv", ontario_data_export)
+
+using BSON: @load
+@load "./output/Saving_Data/ann_para_irbfgs10029.bason" ann_param
+p_min = ann_param
+nday=29
+npredict=nday
+tspan_predict = (0.0, npredict)
+data_acc_predict = data_on.TotalCases[(n+1):n+npredict+1]
+data_daily_predict = data_on.TotalCases[(n+1):n+npredict+1] - data_on.TotalCases[n:n+npredict]
+prob_prediction = ODEProblem(SIR_nn, u_0, tspan_predict, p_min)
+data_prediction = Array(solve(prob_prediction, Tsit5(), saveat = 1))
+data_prediction_acc=data_prediction[2, :]
+data_prediction_daily=zeros(length(data_prediction_acc))
+data_prediction_daily[2:end]=data_prediction_acc[2:end]-data_prediction_acc[1:end-1]
+
+scatter(data_acc_predict, label = "Real accumulated cases")
+plot!(data_prediction[2, :], label = "Fit accumulated cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("Data fitting ($(nday+1) days training data)")
+savefig("output/epiforecastfitacc$nday.png")
+scatter(data_daily_predict, label = "Real daily cases")
+plot!(data_prediction_daily, label = "Fit daily cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("Data fitting ($(nday+1) days training data)")
+savefig("output/epiforecastfitdaily$nday.png")
+##
+p_min = ann_param
+npredict=29+nday+1
+tspan_predict = (0.0, npredict)
+data_acc_predict = data_on.TotalCases[(n+1):n+npredict+1]
+data_daily_predict = data_on.TotalCases[(n+1):n+npredict+1] - data_on.TotalCases[n:n+npredict]
+scatter(data_acc_predict, label = "Real accumulated cases")
+prob_prediction = ODEProblem(SIR_nn, u_0, tspan_predict, p_min)
+data_prediction = Array(solve(prob_prediction, Tsit5(), saveat = 1))
+data_prediction_acc=data_prediction[2, :]
+data_prediction_daily=zeros(length(data_prediction_acc))
+data_prediction_daily[2:end]=data_prediction_acc[2:end]-data_prediction_acc[1:end-1]
+plot!(data_prediction[2, :], label = "Predicted accumulated cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("$(nday+1) days training data to predict 30 days cases")
+savefig("output/epiforecastpredictacc$nday.png")
+scatter(data_daily_predict, label = "Real daily cases")
+plot!(data_prediction_daily, label = "Predicted daily cases",foreground_color_legend=nothing,legend=:topleft)
+xlabel!("Days after Feb 25")
+title!("$(nday+1) days training data to predict 30 days cases")
+savefig("output/epiforecastpredictdaily$nday.png")
