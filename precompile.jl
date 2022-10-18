@@ -2,7 +2,7 @@
 # Activate and set up the project environment
 using Pkg
 Pkg.activate(".")
-Pkg.update() # install
+Pkg.instantiate() # install
 
 ##
 # Precompile to accelerate the computation
